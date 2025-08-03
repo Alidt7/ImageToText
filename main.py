@@ -50,4 +50,4 @@ def handle_photo(message):
 
 
 logging.info("Polling...")
-bot.polling()
+bot.polling(none_stop=True)
