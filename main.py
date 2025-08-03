@@ -38,7 +38,8 @@ def handle_photo(message):
     text = pytesseract.image_to_string(image)
 
     if text.strip():
-      bot.send_message(message.chat.id, f"Extracted Text:\n{text}")
+      bot.send_message(message.chat.id, f"Extracted Text:")
+      bot.send_message(message.chat.id, text)
     else:
       bot.send_message(message.chat.id, "No text found in the image.")
 
@@ -49,4 +50,4 @@ def handle_photo(message):
 
 
 logging.info("Polling...")
-bot.polling(none_stop=True)
+bot.polling()
