@@ -1,6 +1,6 @@
 from config import TOKEN, BOT_USERNAME, ADMIN_ID, ADMIN_USERNAME
 import logging
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageFilter
 import pytesseract
 import telebot
 import time
@@ -29,14 +29,26 @@ def handle_photo(message):
   logging.info("User sent photo...")
   bot.send_message(message.chat.id, "Processing your photo...🌐")
   try:
+    # Step 1: Download the photo
     file_info = bot.get_file(message.photo[-1].file_id)
     downloaded_file = bot.download_file(file_info.file_path)
 
     with open('temp_image.jpg', 'wb') as new_file:
       new_file.write(downloaded_file)
 
+    # Step 2: Open and enhance the image
     image = Image.open('temp_image.jpg')
-    text = pytesseract.image_to_string(image)
+        
+    # Convert to grayscale for better OCR
+    image = image.convert('L')
+        
+    # Increase contrast
+    enhancer = ImageEnhance.Contrast(image)
+    image = enhancer.enhance(2)
+
+    # Step 3: OCR extraction with config
+    custom_config = r'--oem 3 --psm 6'
+    text = pytesseract.image_to_string(image, config=custom_config)
 
     logging.info("Text extracted from the image.")
 
@@ -44,7 +56,7 @@ def handle_photo(message):
       bot.send_message(message.chat.id, "Text extracted successfully! ✅")
       bot.send_message(message.chat.id, "Extracted Text:")
       time.sleep(1)
-      bot.reply_to(message.chat.id, text)
+      bot.send_message(message.chat.id, text)
     else:
       bot.send_message(message.chat.id, "No text found in the image.")
 
