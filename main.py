@@ -61,5 +61,15 @@ def handle_photo(message):
     logging.error(f"Error processing photo: {e}")
     bot.send_message(message.chat.id, "An error occurred while processing the image.")
 
-logging.info("Polling...")
-bot.polling(none_stop=True)
+
+if __name__ == "__main__":
+  while True:
+    logging.info("Bot is running...")
+    try:
+        bot.polling(none_stop=True)
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        logging.info("Retrying...")
+        time.sleep(3)
+        bot.polling(none_stop=True)
+        logging.info("Bot restarted successfully.")
