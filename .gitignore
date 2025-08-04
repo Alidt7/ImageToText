@@ -2,3 +2,4 @@
 temp_image.jpg
 __pycache__/config.cpython-310.pyc
 config.py
+processed_temp_image.jpg
