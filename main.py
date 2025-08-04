@@ -3,6 +3,7 @@ import logging
 from PIL import Image
 import pytesseract
 import telebot
+import time
 
 #-------- Logging config --------
 
@@ -19,14 +20,14 @@ bot = telebot.TeleBot(TOKEN)
 @bot.message_handler(commands=['start'])
 def start(message):
   logging.info("User started the bot.")
-  bot.send_message(message.chat.id, f"Hello {message.from_user.first_name}, I am {BOT_USERNAME}.\nSend a picture to extract text from it.")
-  logging.info("Polling...")
+  bot.send_message(message.chat.id, f"Hello {message.from_user.first_name}, I am {BOT_USERNAME}.\nSend a photo to extract text from it.")
 
 #----------- Text extraction handler -----------
 
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
   logging.info("User sent photo...")
+  bot.send_message(message.chat.id, "Processing your photo...🌐")
   try:
     file_info = bot.get_file(message.photo[-1].file_id)
     downloaded_file = bot.download_file(file_info.file_path)
@@ -37,9 +38,13 @@ def handle_photo(message):
     image = Image.open('temp_image.jpg')
     text = pytesseract.image_to_string(image)
 
+    logging.info("Text extracted from the image.")
+
     if text.strip():
-      bot.send_message(message.chat.id, f"Extracted Text:")
-      bot.send_message(message.chat.id, text)
+      bot.send_message(message.chat.id, "Text extracted successfully! ✅")
+      bot.send_message(message.chat.id, "Extracted Text:")
+      time.sleep(1)
+      bot.reply_to(message.chat.id, text)
     else:
       bot.send_message(message.chat.id, "No text found in the image.")
 
